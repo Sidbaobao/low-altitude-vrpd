@@ -17,3 +17,4 @@ venv/
 # Scratch output (final results/ is committed on purpose, run logs are not)
 results/quick/
 results/*.log
+.pytest_tmp/

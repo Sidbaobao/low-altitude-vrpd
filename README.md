@@ -50,6 +50,63 @@ machine-readable copies in [`results/summary.csv`](results/summary.csv) and
 payload ≤ 60 kg per truck, ≤ 20 kg and ≤ 5 km per drone sortie, each customer served once.
 <!-- RESULTS:END -->
 
+## Analysis
+
+All figures below are produced by `scripts/make_figures.py` from the stored results
+(`results/figures/`, PNG and PDF).  Colours are the same in every figure: orange = UAVRP,
+green = CVRP, blue = VRPD.
+
+### Why the collaborative fleet wins, and what it trades away
+
+![Time-cost plane and decomposition](results/figures/fig_tradeoff.png)
+
+**(a)** The three plans in the time–cost plane.  The efficiency indicator is linear, so every
+line of constant *Z* has the same slope (−*w<sub>c</sub>* / (*w<sub>t</sub>* *v<sub>t</sub>*) =
+−2.5 min per 10k CNY); VRPD is the plan reached first when that line is pushed towards the
+origin.  CVRP is 1.4 (10k CNY) cheaper but 13 min slower; UAVRP is faster than CVRP but
+6.6 (10k CNY) dearer.  **(b)** Total time split into travel time and fixed loading /
+hand-over time (5 min per truck, 4 min per drone).  Ten drone sorties carry 40 min of handling,
+more than the 25 min of five trucks; in the collaborative fleet the two drones finish long
+before the trucks, so only the truck side defines *T* = max{*T*<sub>truck</sub>,
+*T*<sub>drone</sub>}.  **(c)** Travel cost; the fixed cost is 250 in every group by design,
+so it does not affect the ranking.
+
+### The ranking does not hinge on the chosen weights
+
+![Sensitivity to weights and value of time](results/figures/fig_sensitivity.png)
+
+Difference in *Z* between each single-mode group and VRPD; positive values favour VRPD, the
+shaded band marks where VRPD has the lowest *Z*.  **(a)** Time weight swept from 0 to 1 (cost
+weight 1 − *w<sub>t</sub>*) at the paper's value of time: VRPD is the most efficient group for
+every *w<sub>t</sub>* ≥ 0.52, CVRP below that, UAVRP never.  **(b)** Value of time swept from
+200 to 5,000 CNY/min at the paper's weights 0.8 / 0.2: VRPD leads from about 270 CNY/min
+upward.  The single-mode plans minimise distance and are therefore optimal for *any* weights;
+the VRPD plan is the one optimised for the paper's setting, so away from it the VRPD curve is a
+conservative bound – the true gap can only be larger.
+
+### The two-stage method at work
+
+![GA convergence and MILP](results/figures/fig_convergence.png)
+
+Stage 1: six warm-start seeds (diamonds; built from the pure-truck and pure-drone solutions and
+from two constructive heuristics) initialise the genetic algorithm, whose best plan drops below
+the CVRP value in the first generations and converges to *Z* = 56.95 after 83 generations
+(27 s).  Stage 2: that plan warm-starts the complete MILP, which improves it to 56.77 within its
+1800 s limit and proves a lower bound of 53.98 (MIP gap 4.9 %).  The GA trace is regenerated
+deterministically by the figure script.
+
+### The same picture on other instances
+
+![Robustness across random instances](results/figures/fig_robustness.png)
+
+Ten random layouts of 20 customers in the same service area, fleets scaled so that the fixed
+cost stays equal (2 trucks / 4 drones / 1 truck + 2 drones), 60 s per MILP
+(`scripts/robustness.py`).  **(a)** *Z* of the three groups per instance; grey lines join the
+same instance.  **(b)** Paired differences to VRPD with mean ± 95 % CI (*t*-distribution,
+*n* = 10).  VRPD has the lowest *Z* in 10 of 10 instances, by 0.88 (UAVRP) and 1.24 (CVRP)
+on average; both intervals exclude zero.  The pure-truck MILPs solved to optimality, 8 of the
+10 pure-drone and all 10 collaborative MILPs stopped at the 60 s limit with gaps ≤ 2.8 %.
+
 ## Repository layout
 
 ```
@@ -66,8 +123,11 @@ vrpd/
     uavrp.py       pure-drone MILP
     vrpd_model.py  collaborative MILP, the complete model of §3.4
 run_all.py         reproduces the Shenzhen case study end to end
+scripts/
+  make_figures.py  analysis figures: sensitivity, time-cost trade-off, convergence, robustness
+  robustness.py    re-runs the three groups on random instances for the robustness figure
 tests/             pytest suite, including checks against the paper's published tables
-results/           tables, route JSON and figures of the last full run
+results/           tables, route JSON, route maps and analysis figures of the last full run
 paper/             the paper
 ```
 
@@ -90,6 +150,8 @@ Tested with Python 3.13, gurobipy 12.0, matplotlib 3.10.
 ```bash
 python run_all.py --quick     # 12-customer smoke run, ~15 s, checks that everything works
 python run_all.py             # the 50-customer case study of Section 5 (up to ~1 h)
+python scripts/robustness.py  # 10 random 20-customer instances for the robustness figure (~20 min)
+python scripts/make_figures.py  # analysis figures into results/figures/ (PNG + PDF)
 python -m pytest              # unit tests; the Gurobi tests skip themselves without a licence
 ```
 
