@@ -1,0 +1,19 @@
+# Gurobi credentials -- never commit a license file
+*.lic
+gurobi.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+
+# Scratch output (final results/ is committed on purpose, run logs are not)
+results/quick/
+results/*.log
