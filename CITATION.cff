@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper it reproduces and the repository."
+type: software
+title: "low-altitude-vrpd: truck-drone collaborative delivery (CVRP / UAVRP / VRPD) reproduction package"
+authors:
+  - family-names: Gong
+    given-names: Junxiang
+version: 1.0.0
+date-released: 2026-09-08
+repository-code: "https://github.com/Sidbaobao/low-altitude-vrpd"
+license: MIT
+keywords:
+  - vehicle routing problem with drones
+  - truck-drone collaborative delivery
+  - low-altitude economy
+  - mixed-integer linear programming
+  - genetic algorithm
+preferred-citation:
+  type: report
+  title: "Research on Optimization of Urban Logistics Network Based on Low Altitude Economy: Path Planning and Traffic Impact Analysis of Collaborative Distribution Mode Between Drones and Ground Vehicles"
+  authors:
+    - family-names: Gong
+      given-names: Junxiang
+  year: 2025
+  month: 5

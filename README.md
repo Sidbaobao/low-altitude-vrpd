@@ -1,5 +1,10 @@
 # low-altitude-vrpd
 
+[![tests](https://github.com/Sidbaobao/low-altitude-vrpd/actions/workflows/ci.yml/badge.svg)](https://github.com/Sidbaobao/low-altitude-vrpd/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Solver](https://img.shields.io/badge/solver-Gurobi%2012-red)
+
 Code for
 
 > Gong, J. (2025). *Research on Optimization of Urban Logistics Network Based on Low Altitude
@@ -53,8 +58,9 @@ payload ≤ 60 kg per truck, ≤ 20 kg and ≤ 5 km per drone sortie, each custo
 ## Analysis
 
 All figures below are produced by `scripts/make_figures.py` from the stored results
-(`results/figures/`, PNG and PDF).  Colours are the same in every figure: orange = UAVRP,
-green = CVRP, blue = VRPD.
+(`results/figures/`, PNG and PDF).  The encoding is the same in every figure: VRPD in black
+(solid line, filled circle), CVRP in dark blue (dashed, hollow square), UAVRP in dark red
+(dash-dot, hollow triangle).
 
 ### Why the collaborative fleet wins, and what it trades away
 
@@ -101,11 +107,12 @@ deterministically by the figure script.
 
 Ten random layouts of 20 customers in the same service area, fleets scaled so that the fixed
 cost stays equal (2 trucks / 4 drones / 1 truck + 2 drones), 60 s per MILP
-(`scripts/robustness.py`).  **(a)** *Z* of the three groups per instance; grey lines join the
-same instance.  **(b)** Paired differences to VRPD with mean ± 95 % CI (*t*-distribution,
-*n* = 10).  VRPD has the lowest *Z* in 10 of 10 instances, by 0.88 (UAVRP) and 1.24 (CVRP)
-on average; both intervals exclude zero.  The pure-truck MILPs solved to optimality, 8 of the
-10 pure-drone and all 10 collaborative MILPs stopped at the 60 s limit with gaps ≤ 2.8 %.
+(`scripts/robustness.py`).  **(a)** Distribution of *Z* per group over the ten instances
+(box: quartiles and median, whiskers: range, markers: individual instances).  **(b)** Difference
+to VRPD on every instance.  VRPD has the lowest *Z* in 10 of 10 instances, by 0.88 (UAVRP) and
+1.24 (CVRP) on average; the smallest margin is 0.76.  The pure-truck MILPs solved to optimality,
+8 of the 10 pure-drone and all 10 collaborative MILPs stopped at the 60 s limit with gaps
+≤ 2.8 %.
 
 ## Repository layout
 
@@ -129,6 +136,8 @@ scripts/
 tests/             pytest suite, including checks against the paper's published tables
 results/           tables, route JSON, route maps and analysis figures of the last full run
 paper/             the paper
+pyproject.toml     package metadata (pip install -e .)   |  CITATION.cff   how to cite
+.github/workflows  CI: unit tests on Python 3.10 / 3.12, Gurobi smoke tests on the pip licence
 ```
 
 ## Installation
@@ -143,7 +152,8 @@ the size-limited licence that ships with `pip install gurobipy` is **not** (the 
 model has ~15,000 binary variables).  Put the licence where Gurobi expects it (`gurobi.lic` in
 your home directory, or point `GRB_LICENSE_FILE` at it); licence files are git-ignored.
 
-Tested with Python 3.13, gurobipy 12.0, matplotlib 3.10.
+Tested with Python 3.13, gurobipy 12.0, matplotlib 3.10, scipy 1.16.  `pip install -e .` installs
+the `vrpd` package itself (metadata in `pyproject.toml`).
 
 ## Usage
 
