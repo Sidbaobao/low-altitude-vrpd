@@ -33,7 +33,7 @@ Output of `python run_all.py` on the 50-customer instance (seed 2025) with Gurob
 | Group | Fleet | Distance (km) | Total cost (10k CNY) | Total time (min) | **Efficiency Z** | Solver |
 |---|---|---:|---:|---:|---:|---|
 | UAVRP | 10 drones | 17.65 | 267.65 | 57.65 | 58.14 | time limit 900 s, gap 2.78 % |
-| CVRP | 5 trucks | 13.84 | 261.07 | 66.52 | 57.54 | optimal (gap 0.93 %), 1.5 s |
+| CVRP | 5 trucks | 13.84 | 261.07 | 66.52 | 57.54 | solved to the 1 % tolerance (gap 0.93 %), 1.5 s |
 | **VRPD** | 4 trucks + 2 drones | 14.72 | 262.50 | **53.37** | **56.77** | time limit 1800 s, gap 4.91 % |
 
 **The collaborative fleet is the most efficient option**: its Z is 1.3 % below the pure-truck
@@ -41,6 +41,13 @@ fleet and 2.4 % below the pure-drone fleet.  It completes the round 20 % faster 
 alone and 7 % faster than the drones alone, for a total cost only 0.5 % above the cheapest
 (pure-truck) plan.  The two drones take the two outlying clusters that are expensive to reach
 by road, the four trucks cover the dense core – the division of labour the paper argues for.
+
+How much of this the solver certifies: the pure-truck model closed to its 1 % tolerance with a
+lower bound of 57.00, so **no** truck-only plan can reach the collaborative plan's achievable
+Z = 56.77 — that comparison is proven.  The pure-drone run stopped at the time limit with a
+lower bound of 56.52, which is below 56.77, so the margin over UAVRP is an observed result
+rather than a certified one; the sensitivity sweep and the 10-of-10 robustness study below are
+what carry it.
 
 Two-stage solution of the collaborative group: the genetic algorithm reached Z = 56.95 after
 83 generations (27 s); the warm-started MILP improved it to 56.77 within its time limit.
@@ -210,7 +217,7 @@ worse than the GA plan and comes with a proven optimality gap.
 
 ## Tests
 
-`tests/paper_tables.py` contains the routes printed in Table 1 of the paper.  The test-suite
+`tests/paper_tables.py` contains the routes printed in Table 1 of the paper.  The test suite
 shows that
 
 * the published collaborative plan evaluates to the published Table 2 numbers
